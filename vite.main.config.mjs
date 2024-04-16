@@ -5,6 +5,7 @@ import {
   external,
   pluginHotRestart,
 } from './vite.base.config.mjs';
+import { resolve } from 'path'
 
 // https://vitejs.dev/config
 export default defineConfig((env) => {

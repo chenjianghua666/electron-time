@@ -2,6 +2,7 @@ const { BrowserWindow, ipcMain, app } = require("electron");
 const path = require('path')
 
 function createWindow() {
+    console.log('this is debug message!');
     const mainWindow = new BrowserWindow({
         webPreferences: {
             preload: path.join(__dirname, 'preload.js')
@@ -14,7 +15,15 @@ function createWindow() {
         );
         win.setTitle(title);
     });
-    mainWindow.loadFile('index.html');
+
+    if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
+        mainWindow.loadURL(MAIN_WINDOW_VITE_DEV_SERVER_URL);
+      } else {
+        console.log(path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`));
+        mainWindow.loadFile(path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`));
+      }
+    
+    // mainWindow.loadFile('/src/process/01/index.html');
 }
 
 app.whenReady().then(() => {

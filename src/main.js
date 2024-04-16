@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, nativeTheme, globalShortcut } = require('electron');
+const { app, BrowserWindow, ipcMain, nativeTheme, globalShortcut, dialog } = require('electron');
 const path = require('node:path');
 
 const createWindow = () => {
@@ -30,12 +30,15 @@ const createWindow = () => {
     mainWindow.loadFile(path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`));
   }
 
-  ipcMain.handle('dark-mode:toggle', () => {
+  ipcMain.handle('dark-mode:toggle', async () => {
     if (nativeTheme.shouldUseDarkColors) {
       nativeTheme.themeSource = 'light'
     } else {
       nativeTheme.themeSource = 'dark'
     }
+
+    const { canceled, filePaths } = await dialog.showOpenDialog()
+    console.log(filePaths);
     return nativeTheme.shouldUseDarkColors
   })
   
@@ -43,27 +46,13 @@ const createWindow = () => {
     nativeTheme.themeSource = 'system'
   })
 
-
-  ipcMain.on('shell:open', () => {
-    const pageDirectory = __dirname.replace('app.asar', 'app.asar.unpacked')
-    const pagePath = path.join('file://', pageDirectory, 'index.html')
-    shell.openExternal(pagePath)
+  ipcMain.handle('dialog:fileOpen',()=>{
+    console.log('监听到了file open call');
   })
 
   // Open the DevTools.
   mainWindow.webContents.openDevTools();
-
-const win = new BrowserWindow()
-
-win.loadURL('https://nodejs.org/api/events.html#events_class_eventemitter')
-
-win.webContents.on('did-finish-load', async () => {
-  win.webContents.savePage('/tmp/test.html', 'HTMLComplete').then(() => {
-    console.log('Page was saved successfully.')
-  }).catch(err => {
-    console.log(err)
-  })
-})
+  
 };
 
 
